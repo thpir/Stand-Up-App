@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Stand Up!</string>
+    <string name="message_alarm_on">Stand Up Alarm On!</string>
+    <string name="message_alarm_off">Stand Up Alarm Off!</string>
+    <string name="notification_title">Stand Up Alert</string>
+    <string name="notification_text">You should stand up and walk around now!</string>
+    <string name="alarm_on_text">Alarm ON</string>
+    <string name="alarm_off_text">Alarm OFF</string>
+    <string name="image_button_description">An image button that enables or disables the alarm to move around</string>
+</resources>
