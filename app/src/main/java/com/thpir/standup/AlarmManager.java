@@ -12,7 +12,7 @@ public class AlarmManager {
     private android.app.AlarmManager alarmManager;
     private PendingIntent notifyPendingIntent;
 
-    public void createAlarm(Context context, int id) {
+    public void createAlarm(Context context) {
 
         // We create an Intent called notifyIntent. We pass in the context and AlarmReceiver class.
         Intent notifyIntent = new Intent(context, AlarmReceiver.class);
@@ -20,7 +20,7 @@ public class AlarmManager {
         // Now create the notify PendingIntent. Use the context,
         // the NOTIFICATION_ID variable, the new notify intent, and the FLAG_UPDATE_CURRENT flag.
         notifyPendingIntent = PendingIntent.getBroadcast
-                (context, id, notifyIntent, PendingIntent.FLAG_MUTABLE);
+                (context, 0, notifyIntent, PendingIntent.FLAG_IMMUTABLE);
 
         // We initialize the alarmManager in onCreate() by calling getSystemService()
         alarmManager = (android.app.AlarmManager)
@@ -28,18 +28,17 @@ public class AlarmManager {
 
     }
 
-    public void setAlarm(Context context) {
+    public void setAlarm(Context context, int interval) {
 
         // You use the setInexactRepeating() alarm because it is more
         // resource-efficient to use inexact timing,
         // which lets the system bundle alarms from different apps together
-        long repeatInterval = 900000;
         long triggerTime = SystemClock.elapsedRealtime()
-                + repeatInterval;
+                + interval;
 
         if (alarmManager != null) {
             // If the Toggle is turned on, set the repeating alarm with a 15 minute interval.
-            alarmManager.setAndAllowWhileIdle
+            alarmManager.setExactAndAllowWhileIdle
                     (android.app.AlarmManager.ELAPSED_REALTIME_WAKEUP,
                             triggerTime, notifyPendingIntent);
         }

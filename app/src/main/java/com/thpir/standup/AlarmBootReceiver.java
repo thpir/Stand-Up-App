@@ -17,19 +17,27 @@ public class AlarmBootReceiver extends BroadcastReceiver {
                     Context.MODE_PRIVATE);
             // Private boolean that show whether the alarm is on or off
             boolean mAlarmUp = mSharedPreferences.getBoolean("ALARM_UP", false);
-
-            // Create an instance of the AlarmManager class
-            com.thpir.standup.AlarmManager alarmManager = new com.thpir.standup.AlarmManager();
+            int mInterval = mSharedPreferences.getInt("INTERVAL", 3600000);
 
             if (mAlarmUp) {
-                // We create member constants for the notification ID
-                final int NOTIFICATION_ID = 0;
+
+                // Create an instance of the NotificationHelper class
+                NotificationHelper notificationHelper = new NotificationHelper();
+
+                // Create a notification
+                notificationHelper.createNotificationManager(context);
+
+                // Create an instance of the AlarmManager class
+                com.thpir.standup.AlarmManager alarmManager = new com.thpir.standup.AlarmManager();
 
                 // Create the alarm
-                alarmManager.createAlarm(context, NOTIFICATION_ID);
+                alarmManager.createAlarm(context);
 
                 // Set the alarm
-                alarmManager.setAlarm(context);
+                alarmManager.setAlarm(context, mInterval);
+
+                // We call createNotificationChannel() at the end of the onReceive() method
+                notificationHelper.createNotificationChannel(context);
             }
         }
     }

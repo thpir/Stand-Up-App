@@ -12,7 +12,7 @@ import androidx.core.app.NotificationCompat;
 public class NotificationHelper {
 
     // We create a member variable called mNotificationManager of the type NotificationManager
-    public NotificationManager mNotificationManager;
+    private NotificationManager mNotificationManager;
 
     public void createNotificationManager(Context context) {
 
@@ -30,7 +30,7 @@ public class NotificationHelper {
 
     }
 
-    public void deliverNotification(Context context, int id, String channelId) {
+    public void deliverNotification(Context context) {
 
         // We create an Intent that we will use for the notification content intent
         Intent contentIntent = new Intent(context, MainActivity.class);
@@ -40,11 +40,11 @@ public class NotificationHelper {
         // We use the getActivity() method,
         // passing in the notification ID and using the FLAG_UPDATE_CURRENT flag
         PendingIntent contentPendingIntent = PendingIntent.getActivity
-                (context, id, contentIntent, PendingIntent.FLAG_IMMUTABLE);
+                (context, 0, contentIntent, PendingIntent.FLAG_IMMUTABLE);
 
         // We use the NotificationCompat.Builder to build a notification using the notification
         // icon and content intent
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "CHANNEL_0")
                 .setSmallIcon(R.drawable.ic_stand_up)
                 .setContentTitle(context.getString(R.string.notification_title))
                 .setContentText(context.getString(R.string.notification_text))
@@ -55,14 +55,14 @@ public class NotificationHelper {
 
         // At the end of the deliverNotification() method,
         // We use the NotificationManager to deliver the notification
-        mNotificationManager.notify(id, builder.build());
+        mNotificationManager.notify(0, builder.build());
 
     }
 
     /**
      * Creates a Notification channel, for OREO and higher.
      */
-    public void createNotificationChannel(Context context, String channelId) {
+    public void createNotificationChannel(Context context) {
 
         // Create a notification manager object.
         mNotificationManager =
@@ -75,7 +75,7 @@ public class NotificationHelper {
 
             // Create the NotificationChannel with all the parameters.
             NotificationChannel notificationChannel = new NotificationChannel
-                    (channelId,
+                    ("CHANNEL_0",
                             "Stand up notification",
                             NotificationManager.IMPORTANCE_HIGH);
 
