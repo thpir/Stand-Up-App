@@ -7,4 +7,11 @@
     <string name="alarm_on_text">Alarm ON</string>
     <string name="alarm_off_text">Alarm OFF</string>
     <string name="image_button_description">An image button that enables or disables the alarm to move around</string>
+    <string name="toggle_button_left_text">Toggle button left</string>
+    <string name="toggle_button_right_text">Toggle button right</string>
+    <string name="interval_15_minutes">15 minutes</string>
+    <string name="textview_active_between_text">Active between</string>
+    <string name="start_hour"><u>09:00</u></string>
+    <string name="stop_hour"><u>18:00</u></string>
+    <string name="space_between_hours">"  -  "</string>
 </resources>

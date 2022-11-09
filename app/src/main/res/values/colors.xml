@@ -8,6 +8,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="app_color_main">#24B1DC</color>
-    <color name="app_color_deactivated">#808080</color>
+    <color name="app_color_main">#26408B</color>
+    <color name="app_color_light_background">#A6CFD5</color>
+    <color name="app_color_dark_background">#0F084B</color>
+    <color name="app_color_light_text">#FFFFFF</color>
+    <color name="app_color_dark_text">#0D0221</color>
+
 </resources>

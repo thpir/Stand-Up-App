@@ -15,8 +15,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         SharedPreferences mSharedPreferences = context.getSharedPreferences(mSharedPreferencesFile,
                 Context.MODE_PRIVATE);
         // Private boolean that show whether the alarm is on or off
-        int mInterval = mSharedPreferences.getInt("INTERVAL", 0);
-
+        int mInterval = mSharedPreferences.getInt("INTERVAL", 3600000);
 
         // Create an instance of the NotificationHelper class
         NotificationHelper notificationHelper = new NotificationHelper();
