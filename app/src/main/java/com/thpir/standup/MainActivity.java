@@ -19,10 +19,10 @@ public class MainActivity extends AppCompatActivity {
     private boolean mAlarmUp = false;
     private int mInterval = 3600000;
     private int mIntervalPosition = 0;
-    private int mStartTimeHour = 9;
-    private int mStartTimeMinutes = 0;
-    private int mStopTimeHour = 18;
-    private int mStopTimeMinutes = 0;
+    private int mStartTimeHour;
+    private int mStartTimeMinutes;
+    private int mStopTimeHour;
+    private int mStopTimeMinutes;
     private TextView startHour;
     private TextView endHour;
     private final String[] mIntervalList = {"15 Minutes", "30 Minutes", "1 Hour", "2 Hours"};
@@ -226,16 +226,11 @@ public class MainActivity extends AppCompatActivity {
             // Launch Time picker dialog
             TimePickerDialog timePickerDialog = new TimePickerDialog(this,
                     (view, hourOfDay, minute1) -> {
-                        if(hourOfDay <= mStopTimeHour) {
-                            if(minute1 < mStopTimeMinutes) {
-                                mStartTimeHour = hourOfDay;
-                                mStartTimeMinutes = minute1;
-                                setStartStopTime();
-                                savedSharedPreferences();
-                            } else {
-                                Toast.makeText(MainActivity.this, R.string.toast_text_wrong_starthour,Toast.LENGTH_SHORT)
-                                        .show();
-                            }
+                        if((hourOfDay < mStopTimeHour) || (hourOfDay == mStopTimeHour && minute1 < mStopTimeMinutes)) {
+                            mStartTimeHour = hourOfDay;
+                            mStartTimeMinutes = minute1;
+                            setStartStopTime();
+                            savedSharedPreferences();
                         } else {
                             Toast.makeText(MainActivity.this, R.string.toast_text_wrong_starthour,Toast.LENGTH_SHORT)
                                     .show();
@@ -254,16 +249,11 @@ public class MainActivity extends AppCompatActivity {
             // Launch Time picker dialog
             TimePickerDialog timePickerDialog = new TimePickerDialog(this,
                     (view, hourOfDay, minute12) -> {
-                        if(hourOfDay >= mStartTimeHour) {
-                            if(minute12 > mStartTimeMinutes) {
-                                mStopTimeHour = hourOfDay;
-                                mStopTimeMinutes = minute12;
-                                setStartStopTime();
-                                savedSharedPreferences();
-                            } else {
-                                Toast.makeText(MainActivity.this, R.string.toast_text_wrong_endhour,Toast.LENGTH_SHORT)
-                                        .show();
-                            }
+                        if((hourOfDay > mStartTimeHour) || (hourOfDay == mStartTimeHour && minute12 > mStartTimeMinutes)) {
+                            mStopTimeHour = hourOfDay;
+                            mStopTimeMinutes = minute12;
+                            setStartStopTime();
+                            savedSharedPreferences();
                         } else {
                             Toast.makeText(MainActivity.this, R.string.toast_text_wrong_endhour,Toast.LENGTH_SHORT)
                                     .show();

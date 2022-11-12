@@ -34,10 +34,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         // Call the createNotificationManager method from the NotificationHelper class
         notificationHelper.createNotificationManager(context);
 
-        if(hour >= mStartTimeHour &&
-                minute >= mStartTimeMinutes &&
-                hour <= mStopTimeHour &&
-                minute <= mStopTimeMinutes) {
+        if(((hour > mStartTimeHour) || (hour == mStartTimeHour && minute >= mStartTimeMinutes)) &&
+                (hour < mStopTimeHour) || (hour == mStopTimeHour && minute <= mStopTimeMinutes)) {
 
             // Call the method to deliver the notification
             notificationHelper.deliverNotification(context);
