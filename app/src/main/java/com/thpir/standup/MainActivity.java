@@ -7,7 +7,6 @@ import android.text.format.DateFormat;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -226,13 +225,20 @@ public class MainActivity extends AppCompatActivity {
 
             // Launch Time picker dialog
             TimePickerDialog timePickerDialog = new TimePickerDialog(this,
-                    new TimePickerDialog.OnTimeSetListener() {
-                        @Override
-                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                            mStartTimeHour = hourOfDay;
-                            mStartTimeMinutes = minute;
-                            setStartStopTime();
-                            savedSharedPreferences();
+                    (view, hourOfDay, minute1) -> {
+                        if(hourOfDay <= mStopTimeHour) {
+                            if(minute1 < mStopTimeMinutes) {
+                                mStartTimeHour = hourOfDay;
+                                mStartTimeMinutes = minute1;
+                                setStartStopTime();
+                                savedSharedPreferences();
+                            } else {
+                                Toast.makeText(MainActivity.this, R.string.toast_text_wrong_starthour,Toast.LENGTH_SHORT)
+                                        .show();
+                            }
+                        } else {
+                            Toast.makeText(MainActivity.this, R.string.toast_text_wrong_starthour,Toast.LENGTH_SHORT)
+                                    .show();
                         }
                     }, hour, minute, DateFormat.is24HourFormat(this));
             timePickerDialog.show();
@@ -247,13 +253,20 @@ public class MainActivity extends AppCompatActivity {
 
             // Launch Time picker dialog
             TimePickerDialog timePickerDialog = new TimePickerDialog(this,
-                    new TimePickerDialog.OnTimeSetListener() {
-                        @Override
-                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                            mStopTimeHour = hourOfDay;
-                            mStopTimeMinutes = minute;
-                            setStartStopTime();
-                            savedSharedPreferences();
+                    (view, hourOfDay, minute12) -> {
+                        if(hourOfDay >= mStartTimeHour) {
+                            if(minute12 > mStartTimeMinutes) {
+                                mStopTimeHour = hourOfDay;
+                                mStopTimeMinutes = minute12;
+                                setStartStopTime();
+                                savedSharedPreferences();
+                            } else {
+                                Toast.makeText(MainActivity.this, R.string.toast_text_wrong_endhour,Toast.LENGTH_SHORT)
+                                        .show();
+                            }
+                        } else {
+                            Toast.makeText(MainActivity.this, R.string.toast_text_wrong_endhour,Toast.LENGTH_SHORT)
+                                    .show();
                         }
                     }, hour, minute, DateFormat.is24HourFormat(this));
             timePickerDialog.show();

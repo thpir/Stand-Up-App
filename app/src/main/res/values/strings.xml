@@ -14,4 +14,6 @@
     <string name="start_hour"><u>09:00</u></string>
     <string name="stop_hour"><u>18:00</u></string>
     <string name="space_between_hours">"  -  "</string>
+    <string name="toast_text_wrong_starthour">Start hour must be earlier than the end hour</string>
+    <string name="toast_text_wrong_endhour">End hour must be later than the start hour</string>
 </resources>
