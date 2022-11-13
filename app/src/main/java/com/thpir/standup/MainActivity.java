@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
     // Private boolean that show whether the alarm is on or off
     private boolean mAlarmUp = false;
     private int mInterval = 3600000;
-    private int mIntervalPosition = 0;
+    private int mIntervalPosition = 2;
     private int mStartTimeHour;
     private int mStartTimeMinutes;
     private int mStopTimeHour;
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         mSharedPreferences = getSharedPreferences(mSharedPreferencesFile, MODE_PRIVATE);
         mAlarmUp = mSharedPreferences.getBoolean("ALARM_UP", false);
         mInterval = mSharedPreferences.getInt("INTERVAL", 3600000);
-        mIntervalPosition = mSharedPreferences.getInt("INTERVAL_POS", 0);
+        mIntervalPosition = mSharedPreferences.getInt("INTERVAL_POS", 2);
         mStartTimeHour = mSharedPreferences.getInt("START_HOURS", 9);
         mStartTimeMinutes = mSharedPreferences.getInt("START_MINUTES", 0);
         mStopTimeHour = mSharedPreferences.getInt("STOP_HOURS", 18);
