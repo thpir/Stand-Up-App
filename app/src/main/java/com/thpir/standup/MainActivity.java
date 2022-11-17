@@ -1,9 +1,14 @@
 package com.thpir.standup;
 
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.format.DateFormat;
+import android.util.Log;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,19 +22,25 @@ public class MainActivity extends AppCompatActivity {
 
     // Private boolean that show whether the alarm is on or off
     private boolean mAlarmUp = false;
+    private boolean mWeekdaysOnly = false;
     private int mInterval = 3600000;
     private int mIntervalPosition = 2;
     private int mStartTimeHour;
     private int mStartTimeMinutes;
     private int mStopTimeHour;
     private int mStopTimeMinutes;
+    private ImageButton alarmToggle;
+    private TextView alarmTextView;
     private TextView startHour;
     private TextView endHour;
     private final String[] mIntervalList = {"15 Minutes", "30 Minutes", "1 Hour", "2 Hours"};
+    private static final String TAG = "MainActivity";
 
     // Shared Preferences
     private SharedPreferences mSharedPreferences;
     private final String mSharedPreferencesFile = "com.thpir.standup";
+    // Create an instance of the AlarmManager class
+    com.thpir.standup.AlarmManager alarmManager = new com.thpir.standup.AlarmManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         // Initialize the shared preferences
         mSharedPreferences = getSharedPreferences(mSharedPreferencesFile, MODE_PRIVATE);
         mAlarmUp = mSharedPreferences.getBoolean("ALARM_UP", false);
+        mWeekdaysOnly = mSharedPreferences.getBoolean("WEEKDAYS_ONLY", false);
         mInterval = mSharedPreferences.getInt("INTERVAL", 3600000);
         mIntervalPosition = mSharedPreferences.getInt("INTERVAL_POS", 2);
         mStartTimeHour = mSharedPreferences.getInt("START_HOURS", 9);
@@ -46,14 +58,24 @@ public class MainActivity extends AppCompatActivity {
         mStopTimeHour = mSharedPreferences.getInt("STOP_HOURS", 18);
         mStopTimeMinutes = mSharedPreferences.getInt("STOP_MINUTES", 0);
 
+        // When we open the app we want to check first if the user didn't disable the exact alarm permission while the app was closed
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S) {
+            if (!alarmManager.canScheduleAlarms()) {
+                Log.i(TAG, "No permission to set alarms");
+                mAlarmUp = false;
+                savedSharedPreferences();
+            }
+        }
+
         // Initialize the views of the MainActivity
-        ImageButton alarmToggle = findViewById(R.id.imageButtonAlarm);
-        TextView alarmTextView = findViewById(R.id.textViewAlarm);
         TextView intervalTextView = findViewById(R.id.textViewInterval);
         startHour = findViewById(R.id.textViewFromTime);
         endHour = findViewById(R.id.textViewUntilTime);
         ImageView leftArrow = findViewById(R.id.imageViewToggleLeft);
         ImageView rightArrow = findViewById(R.id.imageViewToggleRight);
+        CheckBox weekdaysOnly = findViewById(R.id.checkBoxWeekdays);
+        alarmToggle = findViewById(R.id.imageButtonAlarm);
+        alarmTextView = findViewById(R.id.textViewAlarm);
 
         // Set the state of the toggle
         if (mAlarmUp) {
@@ -66,7 +88,11 @@ public class MainActivity extends AppCompatActivity {
             alarmTextView.setText(R.string.alarm_off_text);
         }
 
+        // Set the saved start and stop time
         setStartStopTime();
+
+        // Set the weekdays only checkbox
+        weekdaysOnly.setChecked(mWeekdaysOnly);
 
         // Set the state of the interval textview
         intervalTextView.setText(mIntervalList[mIntervalPosition]);
@@ -77,9 +103,6 @@ public class MainActivity extends AppCompatActivity {
         // Create a notification
         notificationHelper.createNotificationManager(MainActivity.this);
 
-        // Create an instance of the AlarmManager class
-        com.thpir.standup.AlarmManager alarmManager = new com.thpir.standup.AlarmManager();
-
         // Create an alarm
         alarmManager.createAlarm(MainActivity.this);
 
@@ -88,19 +111,21 @@ public class MainActivity extends AppCompatActivity {
             String toastMessage;
             if (!mAlarmUp) {
 
-                // Set the alarm
-                alarmManager.setAlarm(MainActivity.this, mInterval);
-
-                // Set the toast message for the "on" case.
-                toastMessage = getString(R.string.message_alarm_on);
-
-                // Change the button and textview appearance
-                alarmToggle.setBackgroundResource(R.drawable.round_button_blue);
-                alarmToggle.setImageResource(R.drawable.ic_notifications_active);
-                alarmTextView.setText(R.string.alarm_on_text);
-
-                // Save the toggleButton state to the private boolean mAlarmUp
-                mAlarmUp = true;
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S) {
+                    if (!alarmManager.canScheduleAlarms()) {
+                        Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                        startActivity(intent);
+                        toastMessage = getString(R.string.message_alarm_permission_needed);
+                    } else {
+                        setAlarm();
+                        // Set the toast message for the "on" case.
+                        toastMessage = getString(R.string.message_alarm_on);
+                    }
+                } else {
+                    setAlarm();
+                    // Set the toast message for the "on" case.
+                    toastMessage = getString(R.string.message_alarm_on);
+                }
             } else {
 
                 // Cancel the alarm
@@ -263,9 +288,27 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
+        weekdaysOnly.setOnCheckedChangeListener((compoundButton, b) -> {
+            mWeekdaysOnly = !mWeekdaysOnly;
+            savedSharedPreferences();
+        });
+
         // We call createNotificationChannel() at the end of the onCreate() method
         notificationHelper.createNotificationChannel(MainActivity.this);
 
+    }
+
+    private void setAlarm() {
+        // Set the alarm
+        alarmManager.setAlarm(MainActivity.this, mInterval);
+
+        // Change the button and textview appearance
+        alarmToggle.setBackgroundResource(R.drawable.round_button_blue);
+        alarmToggle.setImageResource(R.drawable.ic_notifications_active);
+        alarmTextView.setText(R.string.alarm_on_text);
+
+        // Save the toggleButton state to the private boolean mAlarmUp
+        mAlarmUp = true;
     }
 
     private void setStartStopTime() {
@@ -431,6 +474,7 @@ public class MainActivity extends AppCompatActivity {
         mSharedPreferences = getSharedPreferences(mSharedPreferencesFile, MODE_PRIVATE);
         SharedPreferences.Editor sharedPreferencesEditor = mSharedPreferences.edit();
         sharedPreferencesEditor.putBoolean("ALARM_UP", mAlarmUp);
+        sharedPreferencesEditor.putBoolean("WEEKDAYS_ONLY", mWeekdaysOnly);
         sharedPreferencesEditor.putInt("INTERVAL", mInterval);
         sharedPreferencesEditor.putInt("INTERVAL_POS", mIntervalPosition);
         sharedPreferencesEditor.putInt("START_HOURS", mStartTimeHour);

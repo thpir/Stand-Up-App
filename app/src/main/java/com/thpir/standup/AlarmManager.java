@@ -4,13 +4,23 @@ import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.SystemClock;
 
 public class AlarmManager {
 
     private android.app.AlarmManager alarmManager;
     private PendingIntent notifyPendingIntent;
+
+    public boolean canScheduleAlarms() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            return alarmManager.canScheduleExactAlarms();
+        } else {
+            return true;
+        }
+    }
 
     public void createAlarm(Context context) {
 
@@ -36,12 +46,25 @@ public class AlarmManager {
         long triggerTime = SystemClock.elapsedRealtime()
                 + interval;
 
-        if (alarmManager != null) {
-            // If the Toggle is turned on, set the repeating alarm with a 15 minute interval.
-            alarmManager.setExactAndAllowWhileIdle
-                    (android.app.AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                            triggerTime, notifyPendingIntent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (alarmManager.canScheduleExactAlarms()) {
+                if (alarmManager != null) {
+                    // If the Toggle is turned on, set the repeating alarm with a 15 minute interval.
+                    alarmManager.setExactAndAllowWhileIdle
+                            (android.app.AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                                    triggerTime, notifyPendingIntent);
+                }
+            }
+        } else {
+            if (alarmManager != null) {
+                // If the Toggle is turned on, set the repeating alarm with a 15 minute interval.
+                alarmManager.setExactAndAllowWhileIdle
+                        (android.app.AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                                triggerTime, notifyPendingIntent);
+            }
         }
+
+
 
         // From developer.android.com: Notice that in the manifest, the boot receiver
         // is set to android:enabled="false". This means that the receiver will not be

@@ -22,11 +22,13 @@ public class AlarmReceiver extends BroadcastReceiver {
         int mStartTimeMinutes = mSharedPreferences.getInt("START_MINUTES", 0);
         int mStopTimeHour = mSharedPreferences.getInt("STOP_HOURS", 18);
         int mStopTimeMinutes = mSharedPreferences.getInt("STOP_MINUTES", 0);
+        boolean mWeekDaysOnly = mSharedPreferences.getBoolean("WEEKDAYS_ONLY", false);
 
         // Get current time
         final Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
+        int day = calendar.get(Calendar.DAY_OF_WEEK);
 
         // Create an instance of the NotificationHelper class
         NotificationHelper notificationHelper = new NotificationHelper();
@@ -37,8 +39,15 @@ public class AlarmReceiver extends BroadcastReceiver {
         if(((hour > mStartTimeHour) || (hour == mStartTimeHour && minute >= mStartTimeMinutes)) &&
                 (hour < mStopTimeHour) || (hour == mStopTimeHour && minute <= mStopTimeMinutes)) {
 
-            // Call the method to deliver the notification
-            notificationHelper.deliverNotification(context);
+            if(mWeekDaysOnly) {
+                if(day != Calendar.SATURDAY && day != Calendar.SUNDAY) {
+                    // Call the method to deliver the notification
+                    notificationHelper.deliverNotification(context);
+                }
+            } else {
+                // Call the method to deliver the notification
+                notificationHelper.deliverNotification(context);
+            }
 
         }
 

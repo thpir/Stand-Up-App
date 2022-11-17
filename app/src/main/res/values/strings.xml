@@ -6,6 +6,7 @@
     <string name="notification_text">You should stand up and walk around now!</string>
     <string name="alarm_on_text">Alarm ON</string>
     <string name="alarm_off_text">Alarm OFF</string>
+    <string name="message_alarm_permission_needed">Grand permission to schedule exact alarms</string>
     <string name="image_button_description">An image button that enables or disables the alarm to move around</string>
     <string name="toggle_button_left_text">Toggle button left</string>
     <string name="toggle_button_right_text">Toggle button right</string>
@@ -16,4 +17,5 @@
     <string name="space_between_hours">"  -  "</string>
     <string name="toast_text_wrong_starthour">Start hour must be earlier than the end hour</string>
     <string name="toast_text_wrong_endhour">End hour must be later than the start hour</string>
+    <string name="textview_weekdays_only_text">Weekdays only</string>
 </resources>
