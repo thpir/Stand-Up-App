@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -34,13 +33,13 @@ public class MainActivity extends AppCompatActivity {
     private TextView startHour;
     private TextView endHour;
     private final String[] mIntervalList = {"15 Minutes", "30 Minutes", "1 Hour", "2 Hours"};
-    private static final String TAG = "MainActivity";
 
     // Shared Preferences
     private SharedPreferences mSharedPreferences;
     private final String mSharedPreferencesFile = "com.thpir.standup";
-    // Create an instance of the AlarmManager class
-    com.thpir.standup.AlarmManager alarmManager = new com.thpir.standup.AlarmManager();
+
+    // Create an instance of the AlarmHelper class
+    AlarmHelper alarmHelper = new AlarmHelper();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,15 +57,6 @@ public class MainActivity extends AppCompatActivity {
         mStopTimeHour = mSharedPreferences.getInt("STOP_HOURS", 18);
         mStopTimeMinutes = mSharedPreferences.getInt("STOP_MINUTES", 0);
 
-        // When we open the app we want to check first if the user didn't disable the exact alarm permission while the app was closed
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S) {
-            if (!alarmManager.canScheduleAlarms()) {
-                Log.i(TAG, "No permission to set alarms");
-                mAlarmUp = false;
-                savedSharedPreferences();
-            }
-        }
-
         // Initialize the views of the MainActivity
         TextView intervalTextView = findViewById(R.id.textViewInterval);
         startHour = findViewById(R.id.textViewFromTime);
@@ -76,17 +66,6 @@ public class MainActivity extends AppCompatActivity {
         CheckBox weekdaysOnly = findViewById(R.id.checkBoxWeekdays);
         alarmToggle = findViewById(R.id.imageButtonAlarm);
         alarmTextView = findViewById(R.id.textViewAlarm);
-
-        // Set the state of the toggle
-        if (mAlarmUp) {
-            alarmToggle.setBackgroundResource(R.drawable.round_button_blue);
-            alarmToggle.setImageResource(R.drawable.ic_notifications_active);
-            alarmTextView.setText(R.string.alarm_on_text);
-        } else {
-            alarmToggle.setBackgroundResource(R.drawable.round_button_grey);
-            alarmToggle.setImageResource(R.drawable.ic_notifications_off);
-            alarmTextView.setText(R.string.alarm_off_text);
-        }
 
         // Set the saved start and stop time
         setStartStopTime();
@@ -104,15 +83,31 @@ public class MainActivity extends AppCompatActivity {
         notificationHelper.createNotificationManager(MainActivity.this);
 
         // Create an alarm
-        alarmManager.createAlarm(MainActivity.this);
+        alarmHelper.createAlarm(MainActivity.this);
+
+        // When we open the app we want to check first if the user didn't disable the exact alarm permission while the app was closed
+        if (alarmHelper.canScheduleAlarms()) {
+            mAlarmUp = false;
+            savedSharedPreferences();
+        }
+
+        // Set the state of the toggle
+        if (mAlarmUp) {
+            alarmToggle.setBackgroundResource(R.drawable.round_button_blue);
+            alarmToggle.setImageResource(R.drawable.ic_notifications_active);
+            alarmTextView.setText(R.string.alarm_on_text);
+        } else {
+            alarmToggle.setBackgroundResource(R.drawable.round_button_grey);
+            alarmToggle.setImageResource(R.drawable.ic_notifications_off);
+            alarmTextView.setText(R.string.alarm_off_text);
+        }
 
         // Call setOnCheckedChangeListener() on the ToggleButton instance.
         alarmToggle.setOnClickListener(v -> {
             String toastMessage;
             if (!mAlarmUp) {
-
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S) {
-                    if (!alarmManager.canScheduleAlarms()) {
+                if (alarmHelper.canScheduleAlarms()) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                         Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
                         startActivity(intent);
                         toastMessage = getString(R.string.message_alarm_permission_needed);
@@ -127,9 +122,8 @@ public class MainActivity extends AppCompatActivity {
                     toastMessage = getString(R.string.message_alarm_on);
                 }
             } else {
-
                 // Cancel the alarm
-                alarmManager.cancelAlarm(MainActivity.this);
+                alarmHelper.cancelAlarm(MainActivity.this);
 
                 // We call cancelAll() on the NotificationManager if the toggle is turned off
                 // to remove the notification
@@ -148,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // Show a toast to say the alarm is turned on or off.
-            Toast.makeText(MainActivity.this, toastMessage,Toast.LENGTH_SHORT)
+            Toast.makeText(MainActivity.this, toastMessage,Toast.LENGTH_LONG)
                     .show();
 
             // Save the new state to shared preferences
@@ -185,13 +179,13 @@ public class MainActivity extends AppCompatActivity {
             // If the alarm button is ON, then cancel the current alarm and set a new one
             if (mAlarmUp) {
                 // Cancel the current alarm
-                alarmManager.cancelAlarm(MainActivity.this);
+                alarmHelper.cancelAlarm(MainActivity.this);
 
                 // to remove the current notification
                 notificationHelper.cancelNotification();
 
                 // Set the alarm with the new interval time
-                alarmManager.setAlarm(MainActivity.this, mInterval);
+                alarmHelper.setAlarm(MainActivity.this, mInterval);
             }
 
             // Save mIntervalPosition and mInterval to shared preferences
@@ -228,13 +222,13 @@ public class MainActivity extends AppCompatActivity {
             // If the alarm button is ON, then cancel the current alarm and set a new one
             if (mAlarmUp) {
                 // Cancel the current alarm
-                alarmManager.cancelAlarm(MainActivity.this);
+                alarmHelper.cancelAlarm(MainActivity.this);
 
                 // to remove the current notification
                 notificationHelper.cancelNotification();
 
                 // Set the alarm with the new interval time
-                alarmManager.setAlarm(MainActivity.this, mInterval);
+                alarmHelper.setAlarm(MainActivity.this, mInterval);
             }
 
             // Save mIntervalPosition and mInterval to shared preferences
@@ -300,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setAlarm() {
         // Set the alarm
-        alarmManager.setAlarm(MainActivity.this, mInterval);
+        alarmHelper.setAlarm(MainActivity.this, mInterval);
 
         // Change the button and textview appearance
         alarmToggle.setBackgroundResource(R.drawable.round_button_blue);

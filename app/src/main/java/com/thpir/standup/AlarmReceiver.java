@@ -52,13 +52,13 @@ public class AlarmReceiver extends BroadcastReceiver {
         }
 
         // Create an instance of the AlarmManager class
-        com.thpir.standup.AlarmManager alarmManager = new com.thpir.standup.AlarmManager();
+        AlarmHelper alarmHelper = new AlarmHelper();
 
         // Create the alarm
-        alarmManager.createAlarm(context);
+        alarmHelper.createAlarm(context);
 
         // Set the alarm
-        alarmManager.setAlarm(context, mInterval);
+        alarmHelper.setAlarm(context, mInterval);
     }
 
 

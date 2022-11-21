@@ -28,13 +28,15 @@ public class AlarmBootReceiver extends BroadcastReceiver {
                 notificationHelper.createNotificationManager(context);
 
                 // Create an instance of the AlarmManager class
-                com.thpir.standup.AlarmManager alarmManager = new com.thpir.standup.AlarmManager();
+                AlarmHelper alarmHelper = new AlarmHelper();
 
                 // Create the alarm
-                alarmManager.createAlarm(context);
+                alarmHelper.createAlarm(context);
 
                 // Set the alarm
-                alarmManager.setAlarm(context, mInterval);
+                if (!alarmHelper.canScheduleAlarms()) {
+                    alarmHelper.setAlarm(context, mInterval);
+                }
 
                 // We call createNotificationChannel() at the end of the onReceive() method
                 notificationHelper.createNotificationChannel(context);
