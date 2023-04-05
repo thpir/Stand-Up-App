@@ -29,7 +29,7 @@
         </receiver>
 
         <receiver
-            android:name=".AlarmReceiver"
+            android:name=".CustomAlarmReceiver"
             android:enabled="true"
             android:exported="false" />
 
